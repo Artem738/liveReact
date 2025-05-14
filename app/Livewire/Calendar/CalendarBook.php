@@ -5,6 +5,8 @@ namespace App\Livewire\Calendar;
 use Livewire\Component;
 use Carbon\Carbon;
 
+use App\Models\Appointment;
+
 class CalendarBook extends Component
 {
     public int $month;
@@ -15,11 +17,14 @@ class CalendarBook extends Component
 
     protected int $maxMonthsAhead = 3;
 
-    private array $mockedAppointments = [
-        '2025-05-14' => ['09:00', '11:00'],
-        '2025-05-15' => ['10:00', '12:00', '14:00'],
-        '2025-05-16' => ['13:00', '15:00'],
-    ];
+    public function selectDay(int $day): void
+    {
+        $this->selectedDate = Carbon::create($this->year, $this->month, $day)->toDateString();
+
+        $this->occupiedTimes = Appointment::where('date', $this->selectedDate)
+            ->pluck('time')
+            ->toArray();
+    }
 
     public function mount(): void
     {
@@ -75,13 +80,6 @@ class CalendarBook extends Component
 
 
 
-    public function selectDay(int $day): void
-    {
-        $this->selectedDate = Carbon::create($this->year, $this->month, $day)->toDateString();
-
-        // Заглушка для занятых часов (обычно получаем из базы)
-        $this->occupiedTimes = $this->mockedAppointments[$this->selectedDate] ?? [];
-    }
 
     public function resetSelection(): void
     {
@@ -95,10 +93,17 @@ class CalendarBook extends Component
         $daysInMonth = $carbon->daysInMonth;
         $startOfMonth = $carbon->startOfMonth()->dayOfWeekIso;
 
+        $appointments = Appointment::whereYear('date', $this->year)
+            ->whereMonth('date', $this->month)
+            ->get()
+            ->groupBy('date')
+            ->map(fn($group) => $group->pluck('time')->toArray())
+            ->toArray();
+
         return view('livewire.calendar.calendar-book', [
             'daysInMonth' => $daysInMonth,
             'startOfMonth' => $startOfMonth,
-            'mockedAppointments' => $this->mockedAppointments,
+            'mockedAppointments' => $appointments,
         ]);
     }
 }

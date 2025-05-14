@@ -20,7 +20,7 @@
 
         {{-- Навигация --}}
         <div class="flex justify-between items-center mb-4">
-            <button wire:click="goToPreviousMonth" class="text-sm text-gray-600 hover:text-black disabled:opacity-30"
+            <button wire:click="goToPreviousMonth" class="text-xl text-gray-600 hover:text-black disabled:opacity-30"
                 @disabled($month == $today->month && $year == $today->year)>
                 ← Previous
             </button>
@@ -29,7 +29,7 @@
                 {{ $currentMonth->format('F Y') }}
             </h2>
 
-            <button wire:click="goToNextMonth" class="text-sm text-gray-600 hover:text-black">
+            <button wire:click="goToNextMonth" class="text-xl text-gray-600 hover:text-black">
                 Next →
             </button>
         </div>
@@ -84,18 +84,27 @@
             <p class="text-sm text-gray-600 mb-2">Pick your time:</p>
 
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                @foreach (array_slice($times, 0, 8) as $time)
-                    @if (in_array($time, $occupiedTimes))
+                @foreach (array_slice($times, 0, 12) as $time)
+                    @php
+                        $appointment = \App\Models\Appointment::where('date', $selectedDate)
+                            ->where('time', $time)
+                            ->first();
+                    @endphp
+
+                    @if ($appointment)
                         <div class="py-1 px-2 border rounded bg-gray-200 text-gray-400 cursor-not-allowed">
-                            {{ $time }}
+                            {{ $time }}<br>
+                            <span class="text-base italic">{{ $appointment->name }}</span>
                         </div>
                     @else
-                        <button class="py-1 px-2 border rounded bg-green-100 hover:bg-green-200">
+                        <a href="{{ route('booking.form', ['date' => $selectedDate, 'time' => $time]) }}"
+                            class="py-1 px-2 border rounded bg-green-100 hover:bg-green-200 block text-center">
                             {{ $time }}
-                        </button>
+                        </a>
                     @endif
                 @endforeach
             </div>
+
 
             <button wire:click="resetSelection" class="mt-4 text-xl underline text-gray-500 hover:text-gray-700">
                 ← Return to calendar
