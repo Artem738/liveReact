@@ -1,0 +1,19 @@
+{
+  "resources/css/app.css": {
+    "file": "assets/app-CCyzdLZ1.css",
+    "src": "resources/css/app.css",
+    "isEntry": true
+  },
+  "resources/js/app.js": {
+    "file": "assets/app-T1DpEqax.js",
+    "name": "app",
+    "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/livewire.js": {
+    "file": "assets/livewire-D6QhxUER.js",
+    "name": "livewire",
+    "src": "resources/js/livewire.js",
+    "isEntry": true
+  }
+}
